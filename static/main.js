@@ -35,19 +35,19 @@ var baseUrl =  "http://127.0.0.1:8000"
 // var baseUrl =  "http://localhost:8080"
 
     // Dropdown 1
-      $.getJSON(baseUrl + '/fonts', function(diseases) {
+      $.getJSON(baseUrl + '/fonts', function(fonts) {
       
-        // Log that fetching diseases has being triggered
-        console.log('Fetching diseases has being triggered');
+        // Log that fetching fonts has being triggered
+        console.log('Fetching fonts has being triggered');
 
         // Loop through each state in the returned data
-        $.each(diseases, function(i, disease) {
+        $.each(fonts, function(i, font) {
             // Append a new dropdown item for each state
-            $dropdown1.append('<div class="item" data-value="' + disease.value + '">' + disease.name + '</div>');
+            $dropdown1.append('<div class="item" data-value="' + font.value + '">' + font.name + '</div>');
         });
 
         // Log that all diseases have been appended 
-        console.log('All diseases have been appended ');
+        console.log('All fonts have been appended ');
 
         // Initialize the dropdown
         $('#drop-down-1').dropdown();
@@ -56,95 +56,49 @@ var baseUrl =  "http://127.0.0.1:8000"
         console.log('dropdown 1 initialised');
     });
 
-    // Button 2, Find Drug Candidates
+    // Button 2, Find font Candidates
     // Updates the Dropdown 2 list
     // Event handlers for buttons
     $('#btn-2').click(function() {
         
+
         // Log that onChange is being triggered
-        console.log('Find Drug Candidates Button triggered');
+        console.log('Find Similar Fonts Button triggered');
 
-        var disease_label = $('#drop-down-1').dropdown('get value');
+        var font_index = $('#dropdown-1').dropdown('get value');
 
-        // Log the name chosen disease from the Dropdown 1
-        console.log("Chosen Disease label: " + disease_label);
+        // Log the name chosen font from the Dropdown 1
+        console.log("Chosen Font label: " + font_index);
+
 
         // Here you can send the disease_name, drug_name, k1 and k2 to your server and get the response
         // Example:
         $.ajax({
-            url: baseUrl + '/similar_fonts',
-            type: 'POST',
-            data: JSON.stringify({ 
-                disease_label: disease_label
-            }),
-            contentType: "application/json; charset=utf-8",
-            dataType: 'json',
-            success: function(data) {
-                var drug_candidates = data.drug_candidates;
-                var console_logging_status = data.console_logging_status;
-                
-                // Show api response for debugging purposes
-                console.log(console_logging_status);
+          url: baseUrl +'/similar_fonts',
+          type: 'POST',
+          data: JSON.stringify({ 
+              font_index: font_index
+          }),
+          contentType: "application/json; charset=utf-8",
+          dataType: 'json',
+          success: function(similar_fonts) {
+              // Clear any existing items in the dropdown
+              $dropdown2.empty();
+              // Loop through each state in the returned data
+              $.each(similar_fonts, function(i, font) {
+                  // Append a new dropdown item for each state
+                  $dropdown2.append('<div class="item" data-value="' + font.value + '">' + font.name + '</div>');
+              });
 
-                // Clear any existing items in the dropdown
-                $dropdown2.empty();
-                // Loop through each state in the returned data
-                $.each(drug_candidates, function(i, drug) {
-                    // Append a new dropdown item for each state
-                    $dropdown2.append('<div class="item" data-value="' + drug.value + '">' + drug.name + '</div>');
-                });
+              // Initialize the dropdown
+              $('#dropdown-2').dropdown();
+          },
+          error: function (request, status, error) {
+              console.error('Error occurred:', error);
+          }
 
-                // Initialize the dropdown
-                $('#drop-down-2').dropdown();
-            },
-
-            
-            error: function (request, status, error) {
-                console.error('Error occurred:', error);
-            }
-
-        });
-    });
-
-    // Dropdown 2
-    // Determining contents of Dropdown 2 is triggered by changes to dropdown 1
-    // You need to extract the selected disease value and pass it in the POST request
-
-    $('#dropdown-1').dropdown({
-        onChange: function(value, text, $selectedItem) {
-
-            // Log that onChange is being triggered
-            console.log('onChange triggered');
-
-            // Log the name when dropdown is selected
-            console.log("Value of dropdown 1: " + JSON.stringify(value));
-
-            // The value will contain the selected disease value
-            // Send a post request for 
-            $.ajax({
-                url: baseUrl + '/fonts',
-                type: 'POST',
-                data: JSON.stringify({ name: value }), 
-                contentType: "application/json; charset=utf-8",
-                dataType: 'json',
-                success: function(drug_candidates) {
-                    // Clear any existing items in the dropdown
-                    $dropdown2.empty();
-                    // Loop through each state in the returned data
-                    $.each(drug_candidates, function(i, drug) {
-                        // Append a new dropdown item for each state
-                        $dropdown2.append('<div class="item" data-value="' + drug.value + '">' + drug.name + '</div>');
-                    });
-
-                    // Initialize the dropdown
-                    $('#dropdown-2').dropdown();
-                },
-                error: function (request, status, error) {
-                    console.error('Error occurred:', error);
-                }
-            });
-        }
-    });
+      });
+  });
 
 
     // Event handlers for buttons
@@ -181,7 +135,7 @@ var baseUrl =  "http://127.0.0.1:8000"
                 // Handle the response from your server
                 console.log("Graph Response: ", JSON.stringify(response));
 
-                graphData = response.reduced_map;
+                graphData = response.visjs_nodes;
                 
 
                 // Use vis-network to render the graphs

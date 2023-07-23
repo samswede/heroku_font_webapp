@@ -15,6 +15,7 @@ from typing import List, Dict, Any
 from vector_database import *
 from utils import *
 from optimised_manager import *
+from dimensionality_reduction import *
 
 # Memory optimisation
 from memory_profiler import profile
@@ -140,26 +141,23 @@ class GraphRequest(BaseModel):
     font_1_label: str
     font_1_index: int
 
-    font_2_label: str
-    font_2_index: int
 
-    num_recommendations: int
-
+class FixedCoordinates(BaseModel):
+    x: bool
+    y: bool
 
 class Node(BaseModel):
     node_id: int = Field(..., alias="id")
     label: str
     color: str
     shape: str
-
-class Edge(BaseModel):
-    from_node: int = Field(..., alias="from")
-    to: int
-    arrows: str
+    image: str
+    x: float
+    y: float
+    fixed: FixedCoordinates
 
 class GraphData(BaseModel):
     nodes: List[Node]
-    edges: List[Edge]
 
 class GraphResponse(BaseModel):
     MOA_network: GraphData
@@ -238,18 +236,14 @@ async def get_graph_data(request: GraphRequest):
     font_1_label = request.font_1_label
     font_1_index = request.font_1_index
 
-    font_2_label = request.font_2_label
-    font_2_index = request.font_2_index
-
-
     #print(f'disease_label: {disease_label}')
     #print(f'drug_label: {drug_label}')
     #print(f'k1: {k1}')
     #print(f'k2: {k2}')
 
-    chosen_font_label = dict_font_indices_to_labels[font_1_index]
+    #chosen_font_label = dict_font_indices_to_labels[font_1_index]
 
-    font_candidates = find_similar_fonts(chosen_font_label=chosen_font_label, distance_metric='euclidean')
+    font_candidates = find_similar_fonts(chosen_font_label=font_1_label, distance_metric='euclidean')
     list_of_font_candidate_indices = [
         dict_font_labels_to_indices[label]
         for label in font_candidates
@@ -269,7 +263,7 @@ async def get_graph_data(request: GraphRequest):
     e = 'successfully retrieved subgraph from database'
     # Create the response
     response = {
-        "reduced_map": visjs_nodes,
+        "visjs_nodes": visjs_nodes,
         "console_logging_status": f'{e}',
     }
 
