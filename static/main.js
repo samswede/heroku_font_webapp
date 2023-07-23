@@ -30,12 +30,12 @@ $(document).ready(function() {
 
 
 //var baseUrl =  "https://msi-app-b9364c344d37.herokuapp.com" // Jacob's Heroku
-var baseUrl = "https://msi-webapp-7ba91279a938.herokuapp.com" //Sam's Heroku
-//var baseUrl =  "http://127.0.0.1:8000"
+//var baseUrl = "https://msi-webapp-7ba91279a938.herokuapp.com" //Sam's Heroku
+var baseUrl =  "http://127.0.0.1:8000"
 // var baseUrl =  "http://localhost:8080"
 
     // Dropdown 1
-      $.getJSON(baseUrl + '/diseases', function(diseases) {
+      $.getJSON(baseUrl + '/fonts', function(diseases) {
       
         // Log that fetching diseases has being triggered
         console.log('Fetching diseases has being triggered');
@@ -72,7 +72,7 @@ var baseUrl = "https://msi-webapp-7ba91279a938.herokuapp.com" //Sam's Heroku
         // Here you can send the disease_name, drug_name, k1 and k2 to your server and get the response
         // Example:
         $.ajax({
-            url: baseUrl + '/drugs_for_disease',
+            url: baseUrl + '/similar_fonts',
             type: 'POST',
             data: JSON.stringify({ 
                 disease_label: disease_label
@@ -122,7 +122,7 @@ var baseUrl = "https://msi-webapp-7ba91279a938.herokuapp.com" //Sam's Heroku
             // The value will contain the selected disease value
             // Send a post request for 
             $.ajax({
-                url: baseUrl + '/diseases',
+                url: baseUrl + '/fonts',
                 type: 'POST',
                 data: JSON.stringify({ name: value }), 
                 contentType: "application/json; charset=utf-8",
