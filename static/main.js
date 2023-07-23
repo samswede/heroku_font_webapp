@@ -181,7 +181,7 @@ var baseUrl =  "http://127.0.0.1:8000"
                 // Handle the response from your server
                 console.log("Graph Response: ", JSON.stringify(response));
 
-                graphData = response.MOA_network;
+                graphData = response.reduced_map;
                 
 
                 // Use vis-network to render the graphs

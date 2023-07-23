@@ -52,10 +52,10 @@ def convert_numpy_to_visjs_format(reduced_data, labels_to_indices_dict, images_t
     - 'fixed': a dictionary specifying whether the x and y coordinates of the node are fixed. Here, both are set to True.
     """
     nodes = []
-    for i, coordinates in enumerate(reduced_data):
+    for font_index, coordinates in enumerate(reduced_data):
         nodes.append({
             "id": i, 
-            "label": list(labels_to_indices_dict.keys())[list(labels_to_indices_dict.values()).index(i)],  # Fetch the label corresponding to the index
+            "label": f'{dict_font_indices_to_labels[font_index]}',  # Fetch the label corresponding to the index
             "shape": "circularImage",  # Specify the shape of the node as a circular image
             "image": images_to_paths_dict[list(labels_to_indices_dict.keys())[list(labels_to_indices_dict.values()).index(i)]],  # Fetch the image path for the label
             "x": coordinates[0],  # Specify the x-coordinate of the node
@@ -65,26 +65,12 @@ def convert_numpy_to_visjs_format(reduced_data, labels_to_indices_dict, images_t
     return nodes
 
 
-
 #%%
-@app.post("/graph", response_class=JSONResponse)
-async def get_graph_data(request: GraphRequest):
-    # Extract parameters from request
-    font_label = request.disease_label
-    total_num_nodes = request.total_num_nodes
 
-    print(f'font_label: {font_label}')
-    print(f'total_num_nodes: {total_num_nodes}')
+list_1 = [0, 1, 2, 3, 4, 5]
+list_2 = ['zero', 'one', 'two', 'three', 'four', 'five']
 
-    # Generate similar fonts
-
-    
-    # Convert graph data into a format that vis.js can handle
-    visjs_nodes = convert_numpy_to_visjs_format(reduced_data, labels_to_indices_dict, images_to_paths_dict)
-
-    # Create the response
-    response = {
-        "MOA_network": visjs_nodes,
-    }
-
-    return response
+for i, j in zip(list_1, list_2):
+    print(f'{i}: {j}')
+# %%
+dict_font_index_to_image_path = {}
