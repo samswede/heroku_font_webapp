@@ -260,7 +260,7 @@ async def get_graph_data(request: GraphRequest):
     pca_reduced_data, pca = reduce_with_pca(data= recommended_font_embeddings_array, n_components= 2)
     
     # Convert graph data into a format that vis.js can handle
-    visjs_nodes = convert_numpy_to_visjs_format(pca_reduced_data, labels_to_indices_dict, images_to_paths_dict)
+    visjs_nodes = graph_manager.convert_numpy_to_visjs_format(list_of_font_candidate_indices, pca_reduced_data)
 
     print_types(visjs_nodes)
 

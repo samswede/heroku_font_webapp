@@ -16,6 +16,9 @@ class GraphManager:
 
         self.data_path = data_path
 
+        font_embeddings_path = f'{data_path}/embeddings/all_font_embeddings.npz'
+        self.font_embeddings_array = self.load_npz(file_path= font_embeddings_path)
+
         dict_font_labels_to_indices_path= f'{data_path}/embeddings/font_name_to_index.pickle'
         self.dict_font_labels_to_indices= self.load_data_dict(dict_font_labels_to_indices_path)
         self.dict_font_indices_to_labels = self.invert_dict(self.dict_font_labels_to_indices)
@@ -39,6 +42,12 @@ class GraphManager:
         with open(file_path, 'rb') as handle:
             loaded_dict = pickle.load(handle)
         return loaded_dict
+    
+    def load_npz(file_path):
+        with np.load(file_path) as data:
+            numpy_array = data['array']
+
+        return numpy_array
 
     #@profile
     def load_dicts(self, data_path):
