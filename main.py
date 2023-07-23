@@ -23,26 +23,8 @@ from memory_profiler import profile
 #===================================================================
 """
 TO DO:
-    - The drug names list is a list of names, duh, but that is a problem for the graph request which expects drug labels.
-        I can use a dictionary to convert them back... but that is gonna be derpy. Better to recompute all of them, and then translate it.
-        There should be a difference between 'name' and 'value'. 'value' should be 'label'?
-
-        I can quickly try the dictionary reconversion just to see if it works.
-            ^That is what i did. There seems to be a pydantic type error. 
-            I need to understand the types of my response and describe that better.
-
     - It runs now. The main problem is that I am at 125% memory quota. 
       That is around 625MB, while my limit is 500MB.
-
-      I'm not sure what is taking up all of this memory. 
-            It could even be all of the dependencies in the virtual environment
-            There is already 100MB in use before loading GraphManager.
-            There appears to be little accumulation of memory.
-
-            The problem is immediate, and steady above the limit.
-            This seems to imply that it happens before GraphManager...
-            How do I find out how much memory I have used before importing GraphManager?
-            Could I potentially put a timout for a couple of seconds to see memory usage?
 """
 
 
