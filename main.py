@@ -44,7 +44,6 @@ origins = [
     'http://localhost:8080',
     'https://msi-app-b9364c344d37.herokuapp.com',  # Allow your local frontend to access the server
     'https://msi-webapp-7ba91279a938.herokuapp.com',
-    uri, # add neo4j sandbox graph database uri
 ]
 
 app.add_middleware(
@@ -82,8 +81,6 @@ font_vector_db.add_vectors(font_embeddings_array, dict_font_labels_to_indices)
 # Instantiate and initialize necessary components for the application
 data_path = './data'
 graph_manager = GraphManager(data_path)
-
-map_drug_diffusion_labels_to_indices, map_drug_diffusion_indices_to_labels, map_indication_diffusion_labels_to_indices, map_indication_diffusion_indices_to_labels = load_dictionaries(data_path)
 
 
 #===================================================================
@@ -198,31 +195,31 @@ async def get_similar_fonts(similar_fonts_request: SimilarFontsRequest):
     return list_of_font_candidates
 
 
-@app.post("/interpolation", response_class=JSONResponse)
-async def get_interpolation_data(request: InterpolationRequest):
-    # Extract parameters from request
-    #font_1_label = request.font_1_label
-    #font_2_label = request.font_2_label
+# @app.post("/interpolation", response_class=JSONResponse)
+# async def get_interpolation_data(request: InterpolationRequest):
+#     # Extract parameters from request
+#     #font_1_label = request.font_1_label
+#     #font_2_label = request.font_2_label
 
-    font_1_index = request.font_1_index
-    font_2_index = request.font_2_index
+#     font_1_index = request.font_1_index
+#     font_2_index = request.font_2_index
 
-    interpolation_fraction = request.interpolation_fraction
+#     interpolation_fraction = request.interpolation_fraction
 
-    #font_1_index = dict_font_labels_to_indices[font_1_label]
-    #font_2_index = dict_font_labels_to_indices[font_2_label]
+#     #font_1_index = dict_font_labels_to_indices[font_1_label]
+#     #font_2_index = dict_font_labels_to_indices[font_2_label]
 
-    # Generate interpolated images
-    font_1_image_b64, font_2_image_b64, interpolated_image_b64 = vae.generate_interpolated_images_b64(font_1_index, font_2_index, interpolation_fraction)
+#     # Generate interpolated images
+#     font_1_image_b64, font_2_image_b64, interpolated_image_b64 = vae.generate_interpolated_images_b64(font_1_index, font_2_index, interpolation_fraction)
     
-    # Create the response
-    response = {
-        "font_1_image": font_1_image_b64,
-        "interpolated_image": interpolated_image_b64,
-        "font_2_image": font_2_image_b64
-    }
+#     # Create the response
+#     response = {
+#         "font_1_image": font_1_image_b64,
+#         "interpolated_image": interpolated_image_b64,
+#         "font_2_image": font_2_image_b64
+#     }
 
-    return response
+#     return response
 
 
 #============================================================================

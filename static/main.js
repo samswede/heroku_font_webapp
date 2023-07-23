@@ -107,16 +107,16 @@ var baseUrl =  "http://127.0.0.1:8000"
         // Log that onChange is being triggered
         console.log('Generate Button triggered');
 
-        var disease_label = $('#drop-down-1').dropdown('get value');
-        var drug_label = $('#drop-down-2').dropdown('get value');
-        var k1 = $('#slider-1').slider('get value');
-        var k2 = $('#slider-2').slider('get value');
+        var font_1_index = $('#drop-down-1').dropdown('get value');
+        var font_1_label = $('#drop-down-1').dropdown('get name');
+        //var k1 = $('#slider-1').slider('get value');
+        //var k2 = $('#slider-2').slider('get value');
 
         // Log the name when dropdown is selected
-        console.log("Chosen Disease label: " + disease_label);
-        console.log("Chosen Drug label: " + drug_label);
-        console.log("Slider 1 value: " + k1);
-        console.log("Slider 2 value: " + k2);
+        console.log("Chosen font_1_index: " + font_1_index);
+        console.log("Chosen font_1_label: " + font_1_label);
+        //console.log("Slider 1 value: " + k1);
+        //console.log("Slider 2 value: " + k2);
 
         // Here you can send the disease_name, drug_name, k1 and k2 to your server and get the response
         // Example:
@@ -124,10 +124,9 @@ var baseUrl =  "http://127.0.0.1:8000"
             url: baseUrl + '/graph',
             type: 'POST',
             data: JSON.stringify({ 
-                disease_label: disease_label,
-                drug_label: drug_label,
-                k1: k1,
-                k2: k2
+                font_1_index: font_1_index,
+                font_1_label: font_1_label,
+
             }),
             contentType: "application/json; charset=utf-8",
             dataType: 'json',
