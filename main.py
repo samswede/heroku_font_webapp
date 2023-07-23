@@ -79,7 +79,7 @@ font_vector_db.add_vectors(font_embeddings_array, dict_font_labels_to_indices)
 
 
 # Instantiate and initialize necessary components for the application
-data_path = './data/'
+data_path = './data'
 graph_manager = GraphManager(data_path)
 
 map_drug_diffusion_labels_to_indices, map_drug_diffusion_indices_to_labels, map_indication_diffusion_labels_to_indices, map_indication_diffusion_indices_to_labels = load_dictionaries(data_path)
@@ -137,10 +137,14 @@ class InterpolationRequest(BaseModel):
 
 
 class GraphRequest(BaseModel):
-    disease_label: str
-    drug_label: str
-    k1: int
-    k2: int
+    font_1_label: str
+    font_1_index: int
+
+    font_2_label: str
+    font_2_index: int
+
+    num_recommendations: int
+
 
 class Node(BaseModel):
     node_id: int = Field(..., alias="id")
@@ -230,33 +234,42 @@ async def get_interpolation_data(request: InterpolationRequest):
 @app.post("/graph", response_model=GraphResponse)
 async def get_graph_data(request: GraphRequest):
     # Extract parameters from request
-    disease_label = request.disease_label
-    drug_label = request.drug_label
-    k1 = request.k1
-    k2 = request.k2
+
+    font_1_label = request.font_1_label
+    font_1_index = request.font_1_index
+
+    font_2_label = request.font_2_label
+    font_2_index = request.font_2_index
+
 
     #print(f'disease_label: {disease_label}')
     #print(f'drug_label: {drug_label}')
     #print(f'k1: {k1}')
     #print(f'k2: {k2}')
 
-    # Derpy fix changing drug_label (which is actually a name right now) back into a label.
-    drug_label = graph_manager.mapping_all_names_to_labels[drug_label]
+    chosen_font_label = dict_font_indices_to_labels[font_1_index]
 
+    font_candidates = find_similar_fonts(chosen_font_label=chosen_font_label, distance_metric='euclidean')
+    list_of_font_candidate_indices = [
+        dict_font_labels_to_indices[label]
+        for label in font_candidates
+    ]
+
+    recommended_font_embeddings_array = font_embeddings_array[list_of_font_candidate_indices, :]
+
+    pca_reduced_data, pca = reduce_with_pca(data= recommended_font_embeddings_array, n_components= 2)
     
     # Convert graph data into a format that vis.js can handle
-    graph_data = graph_manager.convert_networkx_to_vis_graph_data(graph=MOA_subgraph,
-                                                                  node_colors=MOA_subgraph_node_colors, 
-                                                                  node_shapes=MOA_subgraph_node_shapes)
+    visjs_nodes = convert_numpy_to_visjs_format(pca_reduced_data, labels_to_indices_dict, images_to_paths_dict)
 
-    print_types(graph_data)
+    print_types(visjs_nodes)
 
-    print(f'graph_data: {graph_data}')
+    print(f'visjs_nodes: {visjs_nodes}')
 
     e = 'successfully retrieved subgraph from database'
     # Create the response
     response = {
-        "MOA_network": graph_data,
+        "reduced_map": visjs_nodes,
         "console_logging_status": f'{e}',
     }
 
