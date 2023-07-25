@@ -58,6 +58,8 @@ app.add_middleware(
 templates = Jinja2Templates(directory="templates")
 
 # ...
+image_folder_path = './static/all_font_images'
+
 font_embeddings_path = './data/embeddings/all_font_embeddings.npz'
 font_embeddings_array = load_npz(file_path= font_embeddings_path)
 
@@ -96,7 +98,7 @@ def find_similar_fonts(chosen_font_label, distance_metric='euclidean'):
     #====================================
     # Querying Vector Database to return drug candidates
     #====================================
-    num_recommendations = 10
+    num_recommendations = 200
 
     query = chosen_font_embedding
 
@@ -106,6 +108,7 @@ def find_similar_fonts(chosen_font_label, distance_metric='euclidean'):
     #drug_candidates_names = [graph_manager.mapping_drug_label_to_name[i] for i in font_candidates_labels]
 
     return font_candidates_labels # List
+
 
 
 def print_types(data, level=0):
@@ -153,6 +156,7 @@ class Node(BaseModel):
     y: float
     fixed: FixedCoordinates
 
+    
 class GraphData(BaseModel):
     nodes: List[Node]
 
@@ -195,6 +199,7 @@ async def get_similar_fonts(similar_fonts_request: SimilarFontsRequest):
     return list_of_font_candidates
 
 
+
 # @app.post("/interpolation", response_class=JSONResponse)
 # async def get_interpolation_data(request: InterpolationRequest):
 #     # Extract parameters from request
@@ -226,12 +231,15 @@ async def get_similar_fonts(similar_fonts_request: SimilarFontsRequest):
 # Visualise MOA network using vis.js
 #============================================================================
 
-@app.post("/graph", response_model=GraphResponse)
+#@app.post("/graph", response_model=GraphResponse)
+@app.post("/graph", response_model=Any)
 async def get_graph_data(request: GraphRequest):
     # Extract parameters from request
 
     font_1_label = request.font_1_label
     font_1_index = request.font_1_index
+
+    dimensionality_reduction_type = 'pca' #['pca', 'tSNE']
 
     #print(f'disease_label: {disease_label}')
     #print(f'drug_label: {drug_label}')
@@ -246,16 +254,21 @@ async def get_graph_data(request: GraphRequest):
         for label in font_candidates
     ]
 
+
+
     recommended_font_embeddings_array = font_embeddings_array[list_of_font_candidate_indices, :]
 
-    pca_reduced_data, pca = reduce_with_pca(data= recommended_font_embeddings_array, n_components= 2)
-    
+    if dimensionality_reduction_type == 'pca':
+        reduced_data, pca = reduce_with_pca(data= recommended_font_embeddings_array, n_components= 2)
+    else:
+        reduced_data, pca = reduce_with_tsne(data= recommended_font_embeddings_array, n_components= 2)
+
     # Convert graph data into a format that vis.js can handle
-    visjs_nodes = graph_manager.convert_numpy_to_visjs_format(list_of_font_candidate_indices, pca_reduced_data)
+    visjs_nodes = graph_manager.convert_numpy_to_visjs_format(list_of_font_candidate_indices, reduced_data, image_folder_path)
 
-    print_types(visjs_nodes)
+    #print_types(visjs_nodes)
 
-    print(f'visjs_nodes: {visjs_nodes}')
+    #print(f'visjs_nodes: {visjs_nodes}')
 
     e = 'successfully retrieved subgraph from database'
     # Create the response

@@ -57,7 +57,7 @@ def reconstruct_from_pca(reduced_data, pca):
 
 
 # Function for dimensionality reduction using t-Distributed Stochastic Neighbor Embedding (t-SNE)
-def reduce_with_tsne(data, n_components, perplexity= 30, random_state=42):
+def reduce_with_tsne(data, n_components, perplexity= 20, random_state=42):
     """
     This function reduces the dimensionality of the input data using t-SNE.
 

@@ -65,11 +65,11 @@ var baseUrl =  "http://127.0.0.1:8000"
         // Log that onChange is being triggered
         console.log('Find Similar Fonts Button triggered');
 
-        var font_index = $('#dropdown-1').dropdown('get value');
-
-        // Log the name chosen font from the Dropdown 1
-        console.log("Chosen Font label: " + font_index);
-
+        //var font_index = $('#dropdown-1').dropdown('get value');
+        var font_index = parseInt($('#drop-down-1').dropdown('get value'));
+        var font_label = $('#drop-down-1').dropdown('get text');
+        console.log("Chosen Font index: " + font_index);
+        console.log("Chosen Font label: " + font_label);
 
         // Here you can send the disease_name, drug_name, k1 and k2 to your server and get the response
         // Example:
@@ -78,6 +78,7 @@ var baseUrl =  "http://127.0.0.1:8000"
           type: 'POST',
           data: JSON.stringify({ 
               font_index: font_index
+
           }),
           contentType: "application/json; charset=utf-8",
           dataType: 'json',
@@ -101,52 +102,144 @@ var baseUrl =  "http://127.0.0.1:8000"
   });
 
 
-    // Event handlers for buttons
-    $('#btn-1').click(function() {
+//     // Event handlers for buttons
+//     $('#btn-1').click(function() {
         
-        // Log that onChange is being triggered
-        console.log('Generate Button triggered');
+//         // Log that onChange is being triggered
+//         console.log('Generate Button triggered');
 
-        var font_1_index = $('#drop-down-1').dropdown('get value');
-        var font_1_label = $('#drop-down-1').dropdown('get name');
-        //var k1 = $('#slider-1').slider('get value');
-        //var k2 = $('#slider-2').slider('get value');
+//         var font_1_index = parseInt($('#drop-down-1').dropdown('get value'));
+//         var font_1_label = $('#drop-down-1').dropdown('get text');
+//         console.log("Chosen Font index: " + font_1_index);
+//         console.log("Chosen Font label: " + font_1_label);
 
-        // Log the name when dropdown is selected
-        console.log("Chosen font_1_index: " + font_1_index);
-        console.log("Chosen font_1_label: " + font_1_label);
-        //console.log("Slider 1 value: " + k1);
-        //console.log("Slider 2 value: " + k2);
+//         // Here you can send the disease_name, drug_name, k1 and k2 to your server and get the response
+//         // Example:
+//         $.ajax({
+//             url: baseUrl + '/graph',
+//             type: 'POST',
+//             data: JSON.stringify({ 
+//                 font_1_index: font_1_index,
+//                 font_1_label: font_1_label,
 
-        // Here you can send the disease_name, drug_name, k1 and k2 to your server and get the response
-        // Example:
-        $.ajax({
-            url: baseUrl + '/graph',
-            type: 'POST',
-            data: JSON.stringify({ 
-                font_1_index: font_1_index,
-                font_1_label: font_1_label,
+//             }),
+//             contentType: "application/json; charset=utf-8",
+//             dataType: 'json',
+//             success: function(response) {
+//                 // Handle the response from your server
+//                 console.log("Graph Response: ", JSON.stringify(response));
 
-            }),
-            contentType: "application/json; charset=utf-8",
-            dataType: 'json',
-            success: function(response) {
-                // Handle the response from your server
-                console.log("Graph Response: ", JSON.stringify(response));
+//                 var nodesData = new vis.DataSet(response.visjs_nodes);
+//                 var edgesData = new vis.DataSet([]);  // empty, if you don't have edges
 
-                graphData = response.visjs_nodes;
-                
+//                 var visjsdata = {
+//                     nodes: nodesData,
+//                     edges: edgesData
+//                 };
 
-                // Use vis-network to render the graphs
-                new vis.Network(MOA_network, graphData, {});
-            },
-            error: function (request, status, error) {
-                console.error('Error occurred:', error);
-            }
+//                 var options = {
+//                   physics: false,
+//                   // other options...
+//                 };
+              
+//                 // Use vis-network to render the graphs
+//                 new vis.Network(MOA_network, visjsdata, options);
+//             },
+//             error: function (request, status, error) {
+//                 console.error('Error occurred:', error);
+//             }
 
-        });
-    });
+//         });
+//     });
+// });
+
+$('#btn-1').click(function() {
+        
+  // Log that onChange is being triggered
+  console.log('Generate Button triggered');
+
+  var font_1_index = parseInt($('#drop-down-1').dropdown('get value'));
+  var font_1_label = $('#drop-down-1').dropdown('get text');
+  console.log("Chosen Font index: " + font_1_index);
+  console.log("Chosen Font label: " + font_1_label);
+
+  function generateGraph(font_index, font_label) {
+      $.ajax({
+          url: baseUrl + '/graph',
+          type: 'POST',
+          data: JSON.stringify({ 
+              font_1_index: font_index,
+              font_1_label: font_label,
+
+          }),
+          contentType: "application/json; charset=utf-8",
+          dataType: 'json',
+          success: function(response) {
+              // Handle the response from your server
+              console.log("Graph Response: ", JSON.stringify(response));
+
+              var nodesData = new vis.DataSet(response.visjs_nodes);
+              var edgesData = new vis.DataSet([]);  // empty, if you don't have edges
+
+              var visjsdata = {
+                  nodes: nodesData,
+                  edges: edgesData
+              };
+
+              var options = {
+                  physics: false,
+                  
+              };
+          
+              // Use vis-network to render the graphs
+              var network = new vis.Network(MOA_network, visjsdata, options);
+
+              // Click event on the nodes
+              network.on("doubleClick", function (params) {
+                  if (params.nodes.length > 0) {
+                      var node_id = params.nodes[0];
+                      var node_index = nodesData.get(node_id).id;
+                      var node_label = nodesData.get(node_id).label;
+                      // Assuming node labels and indices are the same
+                      generateGraph(node_index, node_label);
+                  }
+              });
+
+              // Event handler for the 'hoverNode' event.
+              // This event is triggered when the mouse hovers over a node.
+              network.on('click', function(params) {
+                // params.node contains the id of the hovered node.
+                // We store it in the variable nodeId for convenience.
+                var nodeId = params.node;
+
+                // We use nodes.get(nodeId) to retrieve the node data from the DataSet.
+                // The data is an object containing all the properties of the node, like its id, label, coordinates, etc.
+                var node = nodesData.get(nodeId);
+
+                // Next, we remove the node from the DataSet using nodes.remove(nodeId).
+                // This doesn't delete the node, but it does remove it from the current visualization.
+                // Since nodes are drawn in the order they appear in the DataSet, 
+                // this node will no longer be drawn until we add it back in.
+                nodesData.remove(nodeId);
+
+                // Finally, we add the node back to the DataSet using nodes.update(node).
+                // Because we're adding it last, it will be drawn last, which means it will appear on top of any other nodes.
+                // Note that this doesn't change the node's position in the DOM or its z-index; 
+                // it's just a workaround to control the drawing order.
+                nodesData.update(node);
+              });
+
+          },
+          error: function (request, status, error) {
+              console.error('Error occurred:', error);
+          }
+      });
+  }
+
+  generateGraph(font_1_index, font_1_label);
 });
+});
+
 
 window.addEventListener('DOMContentLoaded', (event) => {
     // Get the elements with the 'fade-in' and 'fade-in-no-delay' class
